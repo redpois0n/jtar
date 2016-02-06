@@ -17,14 +17,22 @@ public class Main {
                 Header h = new Header();
                 h.readRecord(dis);
 
+                System.out.println("Processing " + h.getName());
                 System.out.println(h.toString());
 
-                byte[] b = new byte[h.getSize()];
-                dis.readFully(b);
-
-                System.out.println("Writing " + h.getName());
                 FileOutputStream fos = new FileOutputStream(h.getName());
-                fos.write(b);
+
+                byte[] b = new byte[512];
+
+                int read;
+                int total = 0;
+
+                while ((read = dis.read(b)) != -1 && total + read < h.getSize()) {
+                    total += read;
+
+                    fos.write(b, 0, 512);
+                }
+
                 fos.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
