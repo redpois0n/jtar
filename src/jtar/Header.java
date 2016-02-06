@@ -19,6 +19,8 @@ public class Header {
 		name, mode, uid, gid, size, mtime, chksum, typeflag, linkname
 	};
 
+	private int offset;
+
 	public void readRecord(DataInputStream dis) throws IOException {
 		for (byte[] arr : order) {
  			dis.readFully(arr);
@@ -97,6 +99,14 @@ public class Header {
 
 	public void setLinkname(String linkname) {
 		this.linkname = Utils.makeCstr(linkname, 100);
+	}
+
+	public int getDataOffset() {
+		return offset;
+	}
+
+	public void setDataOffset(int dataOffset) {
+		this.offset = dataOffset;
 	}
 
 	@Override

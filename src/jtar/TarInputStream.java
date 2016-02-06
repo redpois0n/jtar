@@ -1,5 +1,6 @@
 package jtar;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,20 +12,27 @@ public class TarInputStream extends InputStream {
 	private DataInputStream dis;
 
 	public TarInputStream(InputStream is) throws IOException {
-		this.dis = new DataInputStream(is);
+		this.dis = new DataInputStream(new BufferedInputStream(is, 1024*1024*1024));
+		this.dis.mark(Integer.MAX_VALUE);
 	}
 
 	public List<Header> getHeaders() throws IOException {
+		dis.reset();
 		List<Header> headers = new ArrayList<Header>();
 
+		int read = 0;
 		boolean running = true;
+
 		while (running) {
 			Header h = new Header();
 			h.readRecord(dis);
+			read += 512;
 
 			if (h.getName().length() == 0) {
 				break;
 			}
+
+			h.setDataOffset(read);
 
 			for (int i = 0; i < h.getSize(); i += 512) {
 				long skipped = dis.skip(512);
@@ -32,6 +40,8 @@ public class TarInputStream extends InputStream {
 				if (skipped == -1) {
 					running = false;
 					break;
+				} else {
+					read += 512;
 				}
 			}
 
@@ -39,6 +49,17 @@ public class TarInputStream extends InputStream {
 		}
 
 		return headers;
+	}
+
+	public InputStream open(Header h) throws IOException {
+		dis.reset();
+		dis.skipBytes(h.getDataOffset());
+
+		return dis;
+	}
+
+	public void closeEntry() throws IOException {
+		dis.reset();
 	}
 
 	@Override
@@ -54,5 +75,10 @@ public class TarInputStream extends InputStream {
 	@Override
 	public int read() throws IOException {
 		throw new IOException();
+	}
+
+	@Override
+	public void close() throws IOException {
+		dis.close();
 	}
 }
