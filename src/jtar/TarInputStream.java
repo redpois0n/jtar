@@ -65,6 +65,7 @@ public class TarInputStream extends InputStream {
 	public void closeEntry() throws IOException {
 		dis.reset();
 		activeHeader = null;
+		read = 0;
 	}
 
 	@Override
@@ -77,6 +78,10 @@ public class TarInputStream extends InputStream {
 		}
 
 		read += len;
+
+		if (len <= 0)
+			return -1;
+
 		return dis.read(b, off, len);
 	}
 
