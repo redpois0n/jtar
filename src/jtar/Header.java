@@ -31,7 +31,7 @@ public class Header {
  			dis.readFully(arr);
 		}
 
-		int toSkip = 512 - read;
+		int toSkip = Header.BLOCKSIZE - read;
 		int skipped = 0;
 
 		while ((skipped += dis.skipBytes(toSkip)) < toSkip);

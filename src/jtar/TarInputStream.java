@@ -9,10 +9,12 @@ import java.util.List;
 
 public class TarInputStream extends InputStream {
 
+	public static final int BUFFER_SIZE = 1024 * 1024;
+
 	private DataInputStream dis;
 
 	public TarInputStream(InputStream is) throws IOException {
-		this.dis = new DataInputStream(new BufferedInputStream(is, 1024*1024*1024));
+		this.dis = new DataInputStream(new BufferedInputStream(is, BUFFER_SIZE));
 		this.dis.mark(Integer.MAX_VALUE);
 	}
 
@@ -26,7 +28,7 @@ public class TarInputStream extends InputStream {
 		while (running) {
 			Header h = new Header();
 			h.readRecord(dis);
-			read += 512;
+			read += Header.BLOCKSIZE;
 
 			if (h.getName().length() == 0) {
 				break;
@@ -34,14 +36,14 @@ public class TarInputStream extends InputStream {
 
 			h.setDataOffset(read);
 
-			for (int i = 0; i < h.getSize(); i += 512) {
-				long skipped = dis.skip(512);
+			for (int i = 0; i < h.getSize(); i += Header.BLOCKSIZE) {
+				long skipped = dis.skip(Header.BLOCKSIZE);
 
 				if (skipped == -1) {
 					running = false;
 					break;
 				} else {
-					read += 512;
+					read += Header.BLOCKSIZE;
 				}
 			}
 
@@ -51,7 +53,7 @@ public class TarInputStream extends InputStream {
 		return headers;
 	}
 
-	public InputStream open(Header h) throws IOException {
+	public InputStream openEntry(Header h) throws IOException {
 		dis.reset();
 		dis.skipBytes(h.getDataOffset());
 
@@ -63,7 +65,7 @@ public class TarInputStream extends InputStream {
 	}
 
 	@Override
-	public int read(byte b[], int off, int len) throws IOException {
+	public int read(byte[] b, int off, int len) throws IOException {
 		throw new IOException();
 	}
 
