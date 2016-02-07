@@ -37,6 +37,10 @@ public class Header {
 		while ((skipped += dis.skipBytes(toSkip)) < toSkip);
 	}
 
+	public byte[][] getFields() {
+		return order;
+	}
+
 	public String getName() {
 		return new String(name).trim();
 	}
