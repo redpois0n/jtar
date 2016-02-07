@@ -1,4 +1,4 @@
-package jtar;
+package tarlib;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;

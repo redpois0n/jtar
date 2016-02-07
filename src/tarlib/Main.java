@@ -1,4 +1,4 @@
-package jtar;
+package tarlib;
 
 public class Main {
 

@@ -1,9 +1,8 @@
-package jtar;
+package tarlib;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 public class TarOutputStream extends OutputStream {
 
