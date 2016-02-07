@@ -5,6 +5,8 @@ import java.io.IOException;
 
 public class Header {
 
+	public static final int BLOCKSIZE = 512;
+
 	private byte[] name = new byte[100];
 	private byte[] mode = new byte[8];
 	private byte[] uid = new byte[8];
@@ -22,11 +24,17 @@ public class Header {
 	private int offset;
 
 	public void readRecord(DataInputStream dis) throws IOException {
+		int read = 0;
+
 		for (byte[] arr : order) {
+			read += arr.length;
  			dis.readFully(arr);
 		}
 
-		dis.readFully(new byte[255]);
+		int toSkip = 512 - read;
+		int skipped = 0;
+
+		while ((skipped += dis.skipBytes(toSkip)) < toSkip);
 	}
 
 	public String getName() {
